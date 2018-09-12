@@ -38,6 +38,11 @@ identificador	= {letra}+
 nuevalinea		= \n | \n\r | \r\n
 espacio		= [ \t]+
 %%
+
+"main"            {	if(debug) System.out.println("token MAIN");
+			return sf.newSymbol("MAIN",sym.MAIN);
+		       }
+
 "if"            {	if(debug) System.out.println("token IF");
 			return sf.newSymbol("IF",sym.IF);
 			}
