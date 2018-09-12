@@ -81,6 +81,7 @@ terminal LCOR;
 terminal RCOR;
 terminal RETURN;
 terminal SEMI;
+terminal VOID;
 
 
 /* Simbolos No Terminales */
