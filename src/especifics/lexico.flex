@@ -106,14 +106,26 @@ espacio		= [ \t]+
 			return sf.newSymbol("RCOR",sym.RCOR);
 		    }
 "void"             {	if(debug) System.out.println("token VOID");
-			return sf.newSymbol("void",sym.VOID);
+			return sf.newSymbol("VOID",sym.VOID);
 		    }
+
+"int"             {	if(debug) System.out.println("token INT");
+			return sf.newSymbol("INT",sym.INT);
+		    }
+
+"boolean"             {	if(debug) System.out.println("token BOOLEAN");
+			return sf.newSymbol("BOOLEAN",sym.BOOLEAN);
+		    }
+
 "return"  {	if(debug) System.out.println("token RETURN");
 			return sf.newSymbol("RETURN",sym.RETURN);
 		    }
 
 ";"             {	if(debug) System.out.println("token SEMI");
 			return sf.newSymbol("SEMI",sym.SEMI);
+			}
+","             {	if(debug) System.out.println("token COMMA");
+			return sf.newSymbol("COMMA",sym.COMMA);
 			}
 {numero}        {	if(debug) System.out.println("token NUM");
 			return sf.newSymbol("NUM",sym.NUM,new String(yytext()));

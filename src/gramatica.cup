@@ -1,0 +1,196 @@
+package Tiny;
+
+import java_cup.runtime.*;
+import ast.*;
+//import otros.*;
+
+parser code {:
+
+/***********
+SymbolFactory es una nueva caracteristica que ha sido anadida a las version 11a de cup, la cual facilita la implementacion de clases Symbol personalizadas
+, esto debido a que dicha clase no provee mucha informacion de contexto que podria ser util para el analisis semantico o ayudar en la construccion del AST
+Mas informacion en: http//4thmouse.com/index.php/2007/02/15/using-custom-symbols-in-cup/
+***********/
+	public static void main(String args[]) throws Exception {
+		SymbolFactory sf = new DefaultSymbolFactory();
+		parser parser_obj;
+		
+                Scanner lexico; 
+	 
+		  lexico = new Scanner(
+		  	new java.io.FileInputStream
+		  	("C:/Users/cuenta.inscripcion/Desktop/Tiny/ejemplo_fuente/suma.tny"),sf);
+		  parser_obj=new parser(lexico,sf);
+
+		/*if (args.length==0) 
+			parser_obj=new parser(new Scanner(System.in,sf),sf);
+		else 
+			parser_obj=new parser(new Scanner(new java.io.FileInputStream((new java.io.FileInputStream(
+				" C:/Users/cuenta.inscripcion/Desktop/Tiny/ejemplo_fuente/suma.tny")),sf),sf);
+*/
+		parser_obj.parse();
+		NodoBase root=parser_obj.action_obj.getASTroot();
+		System.out.println();
+		System.out.println("IMPRESION DEL AST GENERADO");
+		System.out.println();
+		ast.Util.imprimirAST(root);
+		TablaSimbolos ts = new TablaSimbolos();
+		ts.cargarTabla(root);
+		ts.ImprimirClaves();
+		Tiny.Generador.setTablaSimbolos(ts);
+		Tiny.Generador.generarCodigoObjeto(root);
+	}
+
+:}
+
+action code {:
+	private boolean debug=true;
+	private NodoBase ast=null;
+	private int lineanum=0;
+	
+	//Debe ser llamada solo despues de un parse(), en caso contrario retornara null siempre;
+	public NodoBase getASTroot(){
+		return ast;
+	}
+	
+:}
+
+/* Simbolos Terminales */
+
+terminal IF;
+terminal THEN;
+terminal ELSE;
+terminal END;
+terminal REPEAT;
+terminal UNTIL;
+terminal READ;
+terminal WRITE;
+terminal String ID;
+terminal String NUM;
+terminal ASSIGN;
+terminal EQ;
+terminal LT;
+terminal PLUS;
+terminal MINUS;
+terminal TIMES;
+terminal OVER;
+terminal LPAREN;
+terminal RPAREN;
+terminal SEMI;
+terminal COMMA;
+terminal INT;
+terminal BOOLEAN;
+/* Simbolos No Terminales */
+non terminal program;
+non terminal NodoBase stmt_seq;
+non terminal NodoBase stmt;
+non terminal NodoBase if_stmt;
+non terminal NodoBase repeat_stmt;
+non terminal NodoBase assign_stmt;
+non terminal NodoBase read_stmt;
+non terminal NodoBase write_stmt;
+non terminal NodoBase exp;
+non terminal NodoBase simple_exp;
+non terminal NodoBase term;
+non terminal NodoBase factor;
+
+/* Precedencia de operadores NO USAR FALLA  
+precedence left PLUS;
+precedence left MINUS;
+precedence left TIMES;
+*/
+
+/* REGLAS GRAMATICALES */
+program       ::= block_list:s
+		;
+block_list    ::= function_list:fls main_function 
+			  |  main_function
+			  ;
+
+main_function ::= MAIN stmt_seq END
+			  ;
+
+function_list ::= function_list function_stmt 
+              | function_stmt
+              ;
+function_stmt ::= type ID LPAREN stmt_params RPAREN stmt_seq END
+			  ;
+
+stmt_seq    ::= stmt_seq:ini SEMI stmt:sent	
+            | stmt:sent	
+		;
+
+stmt        ::= if_stmt:sif	
+            | repeat_stmt:srep	
+            | assign_stmt:sasi	
+            | read_stmt:slec	
+            | write_stmt:sesc
+            | declare_var: dclv
+            | return_stmt: rtst	
+            | call_stmt:cllst
+            | error	
+            ;
+
+if_stmt     ::= IF exp:ex THEN stmt_seq:pthen END	
+		| IF exp:ex THEN stmt_seq:pthen ELSE stmt_seq:pelse END	
+		;
+
+repeat_stmt ::= REPEAT stmt_seq:cuerpo UNTIL exp:prueba	
+		;
+
+stmt_params  ::= stmt_params COMMA declare_var 
+		      | declare_var
+		      | /*empty*/
+		      ;
+call_stmt    ::=   ID LPAREN params_call RPAREN
+			;
+params_call  ::= params_call COMMA exp  
+			 |  exp
+			 | /*empty*/ 		      
+			; 
+
+declare_var  ::= type_var ID 
+			  | type_var vector  
+			  ;
+return_stmt   ::= RETURN exp
+			  |   RETURN 
+			  ;
+assign_stmt ::= ID:variable ASSIGN exp:ex
+			 | vector ASSIGN exp		
+		;
+
+vector       ::= ID LCOR NUM RCOR	
+		;
+read_stmt   ::= READ ID:variable	
+		;
+
+write_stmt  ::= WRITE exp:ex	
+		;
+
+exp         ::= simple_exp:exI LT simple_exp:exD	
+		| simple_exp:exI EQ simple_exp:exD	
+		| simple_exp:ex	
+		;
+
+simple_exp  ::= simple_exp:exI PLUS term:exD	
+		| simple_exp:exI MINUS term:exD	
+		| term:ex	
+		;
+
+term        ::= term:exI TIMES factor:exD	
+		| term:exI OVER factor:exD	
+		| factor:ex	
+		;
+
+factor      ::= LPAREN exp:ex RPAREN	
+		| NUM:valor	
+		| ID:variable	
+		| error	
+		;
+
+type    ::= VOID 
+		| type_var
+
+type_var ::= INT 
+		   | BOOLEAN
+		  ;
