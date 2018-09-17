@@ -1,4 +1,4 @@
-package Tiny;
+package tiny;
 
 public class RegistroSimbolo {
 	private String identificador;

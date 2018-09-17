@@ -1,0 +1,29 @@
+LAB  funcionFuncion                            
+LDA  1                         Asigna memoria a la variable 'i' con posicion de memoria 1
+LDC  0                         ;Cargo constante 0 con posicion de memoria 2
+LDA L2
+LOD  3                         ;Cargo el valor de 'x' con posicion de memoria 3
+RDI                            ;Lee el valor entero 'x' con posocion de memoria 3
+LDC  0                         ;Cargo constante 0 con posicion de memoria 2
+LOD  3                         ;Cargo valor del identificador 'x' con posicion de memoria 3
+GRT                            
+LDA  4                         Asigna memoria a la variable 'fact' con posicion de memoria 4
+LDC  1                         ;Cargo constante 1 con posicion de memoria 5
+STO                           
+LDA  4                         Asigna memoria a la variable 'fact' con posicion de memoria 4
+LOD  4                         ;Cargo valor del identificador 'fact' con posicion de memoria 4
+LOD  3                         ;Cargo valor del identificador 'x' con posicion de memoria 3
+MPI                            
+STO                           
+LDA  3                         Asigna memoria a la variable 'x' con posicion de memoria 3
+LOD  3                         ;Cargo valor del identificador 'x' con posicion de memoria 3
+LDC  1                         ;Cargo constante 1 con posicion de memoria 5
+SBI                            
+STO                           
+LOD  3                         ;Cargo valor del identificador 'x' con posicion de memoria 3
+LDC  0                         ;Cargo constante 0 con posicion de memoria 2
+EQU                            
+FJP L4
+LOD  4                         ;Cargo valor del identificador 'fact' con posicion de memoria 4
+WRI                            
+STP                            

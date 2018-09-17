@@ -1,8 +1,10 @@
-{ Sample program
-  in TINY language -
-  computes factorial
-}
-read x; { input an integer }
-read y;
-z:=x+y;
-write z
+
+void suma()
+f:=g+4;
+end
+
+main
+	read a;
+	b:=c+1; 
+	write d;
+end

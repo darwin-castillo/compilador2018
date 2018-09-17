@@ -80,6 +80,8 @@ terminal SEMI;
 terminal COMMA;
 terminal INT;
 terminal BOOLEAN;
+terminal MAIN;
+
 /* Simbolos No Terminales */
 non terminal program;
 non terminal NodoBase stmt_seq;
@@ -93,7 +95,18 @@ non terminal NodoBase exp;
 non terminal NodoBase simple_exp;
 non terminal NodoBase term;
 non terminal NodoBase factor;
-
+non terminal NodoBase block_list;
+non terminal NodoBase main_function;
+non terminal NodoBase function_list;
+non terminal NodoBase function_stmt;
+non terminal NodoBase stmt_params;
+non terminal NodoBase call_stmt;
+non terminal NodoBase params_call;
+non terminal NodoBase declare_var;
+non terminal NodoBase return_stmt;
+non terminal NodoBase vector;
+non terminal NodoBase type;
+non terminal NodoBase type_var;
 /* Precedencia de operadores NO USAR FALLA  
 precedence left PLUS;
 precedence left MINUS;
@@ -101,96 +114,104 @@ precedence left TIMES;
 */
 
 /* REGLAS GRAMATICALES */
-program       ::= block_list:s
-		;
-block_list    ::= function_list:fls main_function 
-			  |  main_function
-			  ;
+program       	::= block_list:s
+		      	;
 
-main_function ::= MAIN stmt_seq END
-			  ;
+block_list    	::= function_list:fls main_function:mss 
+			  	|  main_function:msfs
+			  	;
 
-function_list ::= function_list function_stmt 
-              | function_stmt
-              ;
-function_stmt ::= type ID LPAREN stmt_params RPAREN stmt_seq END
-			  ;
+main_function 	::= MAIN stmt_seq:ssq END
+			  	;
 
-stmt_seq    ::= stmt_seq:ini SEMI stmt:sent	
-            | stmt:sent	
-		;
+function_list 	::= function_list:flis function_stmt:flsdd 
+              	| function_stmt:fmsf
+              	;
+function_stmt 	::= type:tya ID LPAREN stmt_params:stsms RPAREN stmt_seq:sds END
+			  	;
 
-stmt        ::= if_stmt:sif	
-            | repeat_stmt:srep	
-            | assign_stmt:sasi	
-            | read_stmt:slec	
-            | write_stmt:sesc
-            | declare_var: dclv
-            | return_stmt: rtst	
-            | call_stmt:cllst
-            | error	
-            ;
+stmt_seq    	::= stmt_seq:ini SEMI stmt:sent	
+            	| stmt:sent	
+				;
 
-if_stmt     ::= IF exp:ex THEN stmt_seq:pthen END	
-		| IF exp:ex THEN stmt_seq:pthen ELSE stmt_seq:pelse END	
-		;
+stmt        	::= if_stmt:sif	
+            	| repeat_stmt:srep	
+            	| assign_stmt:sasi	
+            	| read_stmt:slec	
+            	| write_stmt:sesc
+            	| declare_var: dclv
+            	| return_stmt: rtst	
+            	| call_stmt:cllst
+            	| error	
+            	;
 
-repeat_stmt ::= REPEAT stmt_seq:cuerpo UNTIL exp:prueba	
-		;
+if_stmt     	::= IF exp:ex THEN stmt_seq:pthen END	
+				| IF exp:ex THEN stmt_seq:pthen ELSE stmt_seq:pelse END	
+				;
 
-stmt_params  ::= stmt_params COMMA declare_var 
-		      | declare_var
-		      | /*empty*/
-		      ;
-call_stmt    ::=   ID LPAREN params_call RPAREN
-			;
-params_call  ::= params_call COMMA exp  
-			 |  exp
-			 | /*empty*/ 		      
-			; 
+repeat_stmt 	::= REPEAT stmt_seq:cuerpo UNTIL exp:prueba	
+				;
 
-declare_var  ::= type_var ID 
-			  | type_var vector  
-			  ;
-return_stmt   ::= RETURN exp
-			  |   RETURN 
-			  ;
-assign_stmt ::= ID:variable ASSIGN exp:ex
-			 | vector ASSIGN exp		
-		;
+stmt_params  	::= stmt_params:stmtpar COMMA declare_var:decv
+		      	| declare_var:dccv
+		      	| /*empty*/
+		      	;
 
-vector       ::= ID LCOR NUM RCOR	
-		;
-read_stmt   ::= READ ID:variable	
-		;
+call_stmt    	::=   ID LPAREN params_call:pmll RPAREN
+				;
 
-write_stmt  ::= WRITE exp:ex	
-		;
+params_call  	::= params_call:psdll COMMA exp:expss  
+			 	|  exp:exzz
+			 	| /*empty*/ 		      
+				; 
 
-exp         ::= simple_exp:exI LT simple_exp:exD	
-		| simple_exp:exI EQ simple_exp:exD	
-		| simple_exp:ex	
-		;
+declare_var  	::= type_var:tpvv ID 
+			  	| type_var:pmv vector:dsd  
+			  	;
 
-simple_exp  ::= simple_exp:exI PLUS term:exD	
-		| simple_exp:exI MINUS term:exD	
-		| term:ex	
-		;
+return_stmt   	::= RETURN exp:retm
+			  	|   RETURN 
+			  	;
 
-term        ::= term:exI TIMES factor:exD	
-		| term:exI OVER factor:exD	
-		| factor:ex	
-		;
+assign_stmt 	::= ID:variable ASSIGN exp:ex
+			 	| vector ASSIGN exp		
+				;
 
-factor      ::= LPAREN exp:ex RPAREN	
-		| NUM:valor	
-		| ID:variable	
-		| error	
-		;
+vector       	::= ID LCOR NUM RCOR	
+				;
 
-type    ::= VOID 
-		| type_var
+read_stmt   	::= READ ID:variable	
+				;
 
-type_var ::= INT 
-		   | BOOLEAN
-		  ;
+write_stmt  	::= WRITE exp:ex	
+				;
+
+exp         	::= simple_exp:exI LT simple_exp:exD
+				| simple_exp:exI GT simple_exp:exD	
+				| simple_exp:exI EQ simple_exp:exD	
+				| simple_exp:ex	
+				;
+
+simple_exp  	::= simple_exp:exI PLUS term:exD	
+				| simple_exp:exI MINUS term:exD	
+				| term:ex	
+				;
+
+term        	::= term:exI TIMES factor:exD	
+				| term:exI OVER factor:exD	
+				| factor:ex	
+				;
+
+factor      	::= LPAREN exp:ex RPAREN	
+				| NUM:valor	
+				| ID:variable	
+				| error	
+				;
+
+type   			::= VOID 
+				|   type_var
+				;
+
+type_var 		::= INT 
+		   		|   BOOLEAN
+		  		;

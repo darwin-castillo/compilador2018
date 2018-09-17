@@ -1,4 +1,4 @@
-package Tiny;
+package tiny;
 
 import java_cup.runtime.*;
 //import otros.*;

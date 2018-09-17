@@ -1,4 +1,9 @@
-package Tiny;
+package tiny;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /* La idea principal de esta clase (Utilidades de Generacion)es ayudar a emitir las 
  * sentencias en el asembler de la Tiny Machine (TM), haciendo mas sencilla la 
@@ -33,9 +38,10 @@ public class UtGen {
 	/* Defino al registro[1] como el acumulador 2 */
 	public static int  AC1=1;
 	
-	
+		public static int  DM=4; //Direccion del main
 	public static void emitirComentario(String c){
-		if(debug) System.out.println("*      "+c);
+		if(debug) System.out.println(c);
+//            System.out.println("");
 	}
 
 	/* Este procedimiento emite sentencias RO (Solo Registro)
@@ -48,15 +54,40 @@ public class UtGen {
 	 * t = segundo registro operando
 	 * c = comentario a emitir en modo debug
 	 */
-	public static void emitirRO(String op, int r, int s, int t, String c){
-		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+s+","+t );
-		if(debug)
-			System.out.print("      "+c);
+	public static void emitirRO(String op, int r, int s, int t, String c, BufferedWriter bw){
+//		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+s+","+t );
+//		if(debug)
+//			System.out.print("      "+c);
 		System.out.print("\n");
+                
+                
+                 try {
+                bw.write("\n");
+                bw.newLine();
+            } catch (IOException ex) {
+                Logger.getLogger(UtGen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                
 		if(instruccionMasAlta < instruccionActual) 
 			instruccionMasAlta = instruccionActual;
 	}
 	
+        public static void emitirRO(String op, String c, BufferedWriter bw){
+            String msj = op+"                            "+c;
+		System.out.print(msj);
+                 try {
+                bw.write(msj);
+                bw.newLine();
+            } catch (IOException ex) {
+                Logger.getLogger(UtGen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+//		if(debug)
+//			System.out.print("      "+c);
+		System.out.print("\n");
+		if(instruccionMasAlta < instruccionActual) 
+			instruccionMasAlta = instruccionActual;
+	}
+                
 	/* Este procedimiento emite sentencias RM (Registro a memoria)
 	 * de la TM		opcode r,d(s)  		a=d+reg[s]
 	 * 				reg[PC_REG]=a  o	reg[r] = x (dependiendo de instruccion de carga)
@@ -67,20 +98,35 @@ public class UtGen {
 	 * s = registro con la direccion base
 	 * c = comentario a emitir en modo debug
 	 */	
-	public static void emitirRM(String op, int r, int d, int s, String c){
-		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+d+"("+s+")" );
-		if(debug)
-			System.out.print("      "+c);
-		System.out.print("\n");
+	public static void emitirRM(String op, int r, int d, int s, String c, BufferedWriter bw){
+//		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+d+"("+s+")" );
+//		if(debug)
+//			System.out.print("      "+c);
+//		System.out.print("\n");
 		if(instruccionMasAlta < instruccionActual) 
 			instruccionMasAlta = instruccionActual;	
 	}
 	
+        public static void emitirRM(String op, String d, String c,  BufferedWriter bw){
+		System.out.print(op+"  "+d+"                         "+c );
+                 try {
+                bw.write(op+"  "+d+"                         "+c);
+                bw.newLine();
+            } catch (IOException ex) {
+                Logger.getLogger(UtGen.class.getName()).log(Level.SEVERE, null, ex);
+            }
+//		if(debug)
+//			System.out.print("      "+c);
+		System.out.print("\n");
+		if(instruccionMasAlta < instruccionActual) 
+			instruccionMasAlta = instruccionActual;	
+	}
+                
 	/* La funcion emitirSalto, salta "cantidad" de localidades de codigo
 	 * para el reajuste posterior. Tambien devuelve la posicion actual
 	 * del codgio generado
 	 */
-	public static int emitirSalto( int cantidad){
+	public static int emitirSalto(int cantidad){
 		int anterior = instruccionActual;
 		instruccionActual += cantidad;
 		if(instruccionMasAlta < instruccionActual) 
@@ -113,15 +159,30 @@ public class UtGen {
 	 * a = la localidad absoluta en memoria
 	 * c = comentario a emitir en modo debug
 	 */
-	public static void emitirRM_Abs(String op, int r, int a, String c){
-		System.out.print((instruccionActual)+":       "+op+"       "+r+","+(a-(instruccionActual+1))+"("+PC+")" );
+	public static void emitirRM_Abs(String op, int r, int a, String c, BufferedWriter bw){
+		System.out.print(op+"  L"+a);
+            try {
+                bw.write(op+" L"+a);
+                bw.newLine();
+            } catch (IOException ex) {
+                Logger.getLogger(UtGen.class.getName()).log(Level.SEVERE, null, ex);
+            }
 		++instruccionActual;
-		if(debug)
-			System.out.print("      "+c);
+//		if(debug)
+//			System.out.print("      "+c);
 		System.out.print("\n");
 		if(instruccionMasAlta < instruccionActual) 
 			instruccionMasAlta = instruccionActual;	
 	}
 	
+        public static void emitirRM_Abs(String op, String c, BufferedWriter bw){
+            System.out.print(op+"  "+c);
+            ++instruccionActual;
+            
+            System.out.print("\n");
+            if(instruccionMasAlta < instruccionActual) 
+                    instruccionMasAlta = instruccionActual;	
+        }
+                
 /*TODO: Cambiar emision por pantalla por stream*/	
 }
